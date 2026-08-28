@@ -1,0 +1,18 @@
+# A hand-written gravity catalogue, in the three shapes people actually write.
+# Values are surface gravity as a multiple of Earth's.
+# Everything here is invented sample data for this repository.
+
+# 1. name and factor on one line
+Titan 0.14
+Ganymede 0.15
+
+# 2. name on one line, factor on the next
+Europa
+0.134
+
+# 3. written as a sentence
+The gravity of Ceres is 0.029
+
+# and one line that is deliberately broken, to show it is reported and not
+# silently dropped
+Mimas approximately
