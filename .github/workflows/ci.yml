@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ["17", "21"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+
+      - name: Build, test, checkstyle and format check
+        run: mvn -B verify
+
+      - name: Smoke test the command line
+        run: |
+          set -e
+          java -jar target/java-programming-retrospective-1.0.0.jar scene data/sailboat.txt "$RUNNER_TEMP/scene.png"
+          test -s "$RUNNER_TEMP/scene.png"
+          java -jar target/java-programming-retrospective-1.0.0.jar encode data/sailboat.map "$RUNNER_TEMP/encoded.txt"
+          diff "$RUNNER_TEMP/encoded.txt" data/sailboat.txt
+          # exits 1 on purpose: the sample catalogue has one unreadable line
+          if java -jar target/java-programming-retrospective-1.0.0.jar weights data/gravity.txt 150; then
+            echo "expected a non-zero exit for the deliberately broken line" >&2
+            exit 1
+          fi
+          echo "command line smoke test passed"
